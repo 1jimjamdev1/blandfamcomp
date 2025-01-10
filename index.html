@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Competition Tracker</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
@@ -23,6 +24,45 @@
 
     <main>
         <p>Select a competitor to view their progress and submit new metrics.</p>
+
+        <section id="leaderboard">
+            <h2>Overall Leaderboard</h2>
+            <ul id="leaderboard-list"></ul>
+        </section>
     </main>
+
+    <script>
+        // Example Competitor JSON URLs
+        const competitorFiles = ["james.json", "sharne.json", "alecia.json", "alasdair.json"];
+
+        // Fetch data for all competitors
+        Promise.all(competitorFiles.map(file => fetch(file).then(res => res.json())))
+            .then(dataArray => {
+                const leaderboard = dataArray.map((data, index) => {
+                    const baseline = { bf: 60, rhr: 60, time: 60 }; // Default baseline
+                    const latest = data.data[data.data.length - 1] || baseline;
+
+                    const bfImprovement = ((baseline.bf - latest.bf) / baseline.bf) * 100 || 0;
+                    const rhrImprovement = ((baseline.rhr - latest.rhr) / baseline.rhr) * 100 || 0;
+                    const timeImprovement = ((baseline.time - latest.time) / baseline.time) * 100 || 0;
+
+                    const avgImprovement = (bfImprovement + rhrImprovement + timeImprovement) / 3;
+
+                    return { name: competitorFiles[index].replace('.json', ''), score: avgImprovement };
+                });
+
+                // Sort leaderboard
+                leaderboard.sort((a, b) => b.score - a.score);
+
+                // Render leaderboard
+                const leaderboardList = document.getElementById('leaderboard-list');
+                leaderboard.forEach(({ name, score }) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${name.charAt(0).toUpperCase() + name.slice(1)}: ${score.toFixed(2)}% improvement`;
+                    leaderboardList.appendChild(li);
+                });
+            })
+            .catch(console.error);
+    </script>
 </body>
 </html>

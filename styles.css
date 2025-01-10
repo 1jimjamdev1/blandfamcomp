@@ -37,35 +37,11 @@ h1, h2 {
     color: #333;
 }
 
-form label {
-    display: block;
-    margin: 10px 0 5px;
-}
-
-form input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-form button {
-    padding: 10px 15px;
-    background: #007BFF;
-    border: none;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-form button:hover {
-    background: #0056b3;
-}
-
-canvas {
-    max-width: 100%;
-}
-
 ul {
     padding: 0;
     list-style: none;
+}
+
+#leaderboard-list li {
+    margin: 5px 0;
 }
