@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharne - Fitness Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Sharne's Fitness Tracker</h1>
+        <nav>
+            <a href="index.html">Back to Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <form id="metrics-form">
+            <label for="bf">Body Fat %:</label>
+            <input type="number" id="bf" name="bf" step="0.1">
+
+            <label for="rhr">Resting Heart Rate (bpm):</label>
+            <input type="number" id="rhr" name="rhr">
+
+            <label for="time">5km Time (minutes):</label>
+            <input type="number" id="time" name="time" step="0.1">
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <section>
+            <h2>Progress Chart</h2>
+            <canvas id="progress-chart"></canvas>
+        </section>
+
+        <section>
+            <h2>Historical Data</h2>
+            <ul id="historical-data"></ul>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('metrics-form');
+        const chartCtx = document.getElementById('progress-chart').getContext('2d');
+        const dataList = document.getElementById('historical-data');
+
+        const jsonFileName = "sharne.json";
+
+        let userData = [];
+
+        fetch(jsonFileName)
+            .then(response => response.json())
+            .then(data => {
+                userData = data;
+                renderChart();
+                renderHistoricalData();
+            })
+            .catch(() => console.error(`Error loading ${jsonFileName}`));
+
+        function renderChart() {
+            const labels = userData.map(entry => entry.date);
+            const bfData = userData.map(entry => entry.bf);
+            const rhrData = userData.map(entry => entry.rhr);
+            const timeData = userData.map(entry => entry.time);
+
+            new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Body Fat %', data: bfData, borderColor: 'red', fill: false },
+                        { label: 'Resting Heart Rate', data: rhrData, borderColor: 'blue', fill: false },
+                        { label: '5km Time', data: timeData, borderColor: 'green', fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Value' } }
+                    }
+                }
+            });
+        }
+
+        function renderHistoricalData() {
+            dataList.innerHTML = '';
+            userData.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `${entry.date}: BF% - ${entry.bf}, RHR - ${entry.rhr}, Time - ${entry.time}`;
+                dataList.appendChild(li);
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const bf = parseFloat(document.getElementById('bf').value);
+            const rhr = parseInt(document.getElementById('rhr').value, 10);
+            const time = parseFloat(document.getElementById('time').value);
+
+            const entry = {
+                date: new Date().toLocaleDateString(),
+                bf,
+                rhr,
+                time
+            };
+
+            userData.push(entry);
+
+            const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = jsonFileName;
+            link.click();
+
+            renderChart();
+            renderHistoricalData();
+        });
+    </script>
+</body>
+</html>

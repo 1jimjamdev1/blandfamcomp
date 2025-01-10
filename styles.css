@@ -33,12 +33,8 @@ main {
     padding: 20px;
 }
 
-section {
-    background: #fff;
-    margin: 20px 0;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+h1, h2 {
+    color: #333;
 }
 
 form label {
@@ -65,15 +61,11 @@ form button:hover {
     background: #0056b3;
 }
 
-.charts canvas {
+canvas {
     max-width: 100%;
 }
 
-#leaderboard ul {
+ul {
     padding: 0;
     list-style: none;
-}
-
-#leaderboard ul li {
-    margin: 5px 0;
 }
