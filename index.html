@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Competition Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Fitness Competition Tracker</h1>
+        <p>Competition ends on: <strong>24th December 2025</strong></p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#james">James</a></li>
+            <li><a href="#sharne">Sharne</a></li>
+            <li><a href="#alecia">Alecia</a></li>
+            <li><a href="#alasdair">Alasdair</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- James -->
+        <section id="james">
+            <h2>James</h2>
+            <form class="metrics-form" data-user="james">
+                <label for="bf-james">Body Fat %:</label>
+                <input type="number" id="bf-james" name="bf">
+
+                <label for="rhr-james">Resting Heart Rate (bpm):</label>
+                <input type="number" id="rhr-james" name="rhr">
+
+                <label for="5km-james">5km Time (minutes):</label>
+                <input type="number" id="5km-james" name="5km">
+
+                <button type="submit">Submit</button>
+            </form>
+
+            <div class="charts" id="charts-james">
+                <canvas id="chart-james"></canvas>
+            </div>
+        </section>
+
+        <!-- Sharne -->
+        <section id="sharne">
+            <h2>Sharne</h2>
+            <form class="metrics-form" data-user="sharne">
+                <label for="bf-sharne">Body Fat %:</label>
+                <input type="number" id="bf-sharne" name="bf">
+
+                <label for="rhr-sharne">Resting Heart Rate (bpm):</label>
+                <input type="number" id="rhr-sharne" name="rhr">
+
+                <label for="5km-sharne">5km Time (minutes):</label>
+                <input type="number" id="5km-sharne" name="5km">
+
+                <button type="submit">Submit</button>
+            </form>
+
+            <div class="charts" id="charts-sharne">
+                <canvas id="chart-sharne"></canvas>
+            </div>
+        </section>
+
+        <!-- Alecia -->
+        <section id="alecia">
+            <h2>Alecia</h2>
+            <form class="metrics-form" data-user="alecia">
+                <label for="bf-alecia">Body Fat %:</label>
+                <input type="number" id="bf-alecia" name="bf">
+
+                <label for="rhr-alecia">Resting Heart Rate (bpm):</label>
+                <input type="number" id="rhr-alecia" name="rhr">
+
+                <label for="5km-alecia">5km Time (minutes):</label>
+                <input type="number" id="5km-alecia" name="5km">
+
+                <button type="submit">Submit</button>
+            </form>
+
+            <div class="charts" id="charts-alecia">
+                <canvas id="chart-alecia"></canvas>
+            </div>
+        </section>
+
+        <!-- Alasdair -->
+        <section id="alasdair">
+            <h2>Alasdair</h2>
+            <form class="metrics-form" data-user="alasdair">
+                <label for="bf-alasdair">Body Fat %:</label>
+                <input type="number" id="bf-alasdair" name="bf">
+
+                <label for="rhr-alasdair">Resting Heart Rate (bpm):</label>
+                <input type="number" id="rhr-alasdair" name="rhr">
+
+                <label for="5km-alasdair">5km Time (minutes):</label>
+                <input type="number" id="5km-alasdair" name="5km">
+
+                <button type="submit">Submit</button>
+            </form>
+
+            <div class="charts" id="charts-alasdair">
+                <canvas id="chart-alasdair"></canvas>
+            </div>
+        </section>
+
+        <!-- Leaderboard -->
+        <section id="leaderboard">
+            <h2>Leaderboard</h2>
+            <div id="overall-ranking">
+                <h3>Overall Ranking</h3>
+                <ul id="overall-leaderboard">
+                    <!-- Placeholder for overall leaderboard -->
+                </ul>
+            </div>
+
+            <div id="metric-ranking">
+                <h3>Individual Metrics</h3>
+                <ul>
+                    <li id="bf-leaderboard">Body Fat %</li>
+                    <li id="rhr-leaderboard">Resting Heart Rate</li>
+                    <li id="5km-leaderboard">5km Time</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.metrics-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const user = this.dataset.user;
+                const bf = parseFloat(this.querySelector('input[name="bf"]').value);
+                const rhr = parseFloat(this.querySelector('input[name="rhr"]').value);
+                const time = parseFloat(this.querySelector('input[name="5km"]').value);
+                updateData(user, { bf, rhr, time });
+            });
+        });
+
+        const userData = {
+            james: [],
+            sharne: [],
+            alecia: [],
+            alasdair: []
+        };
+
+        function updateData(user, metrics) {
+            userData[user].push({ ...metrics, date: new Date() });
+            renderCharts(user);
+            updateLeaderboard();
+        }
+
+        function renderCharts(user) {
+            const ctx = document.getElementById(`chart-${user}`).getContext('2d');
+            const data = userData[user];
+            const labels = data.map(entry => entry.date.toLocaleDateString());
+            const bfData = data.map(entry => entry.bf);
+            const rhrData = data.map(entry => entry.rhr);
+            const timeData = data.map(entry => entry.time);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Body Fat %', data: bfData, borderColor: 'red', fill: false },
+                        { label: 'Resting Heart Rate', data: rhrData, borderColor: 'blue', fill: false },
+                        { label: '5km Time', data: timeData, borderColor: 'green', fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Value' } }
+                    }
+                }
+            });
+        }
+
+        function updateLeaderboard() {
+            const overall = Object.entries(userData).map(([user, data]) => {
+                const latest = data[data.length - 1];
+                return { user, score: latest ? latest.bf + latest.rhr + latest.time : Infinity };
+            }).sort((a, b) => a.score - b.score);
+
+            const overallList = document.getElementById('overall-leaderboard');
+            overallList.innerHTML = overall.map(entry => `<li>${entry.user}: ${entry.score.toFixed(2)}</li>`).join('');
+        }
+    </script>
+</body>
+</html>
